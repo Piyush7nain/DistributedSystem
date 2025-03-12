@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: follower
 spec:
-  replicas: 3
+  replicas: 2
   selector:
     matchLabels:
       app: follower
@@ -17,21 +17,21 @@ spec:
           image: distributed-system:latest
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 8081
+            - containerPort: 8080
           env:
             - name: NODE_ROLE
               value: "follower"
             - name: SERVER_PORT
-              value: "8081"
+              value: "8080"
           livenessProbe:
             httpGet:
               path: /replica/health
-              port: 8081
+              port: 8080
             initialDelaySeconds: 3
             periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /replica/health
-              port: 8081
+              port: 8080
             initialDelaySeconds: 3
             periodSeconds: 10

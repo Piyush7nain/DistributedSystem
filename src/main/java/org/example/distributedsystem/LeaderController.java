@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 @RestController
@@ -34,18 +35,24 @@ public class LeaderController {
     @Value("${node.role}")
     private String nodeRole;
 
-    private List<String> followerUrls = new ArrayList<>();
+    private final List<String> followerUrls = new CopyOnWriteArrayList<>();
 
     @PostConstruct
     public void discoverFollowers() {
+        updateFollowerUrls();
+    }
+
+    public void updateFollowerUrls() {
         int retries = 5;
         if("leader".equalsIgnoreCase(nodeRole)){
             while (retries-- > 0) {
                 try {
                     InetAddress[] addresses = InetAddress.getAllByName(followerServiceName);
-                    followerUrls = Arrays.stream(addresses)
+                    List<String> newFollowerUrls = Arrays.stream(addresses)
                             .map(addr -> "http://" + addr.getHostAddress() + ":" + followerServicePort)
                             .collect(Collectors.toList());
+                    followerUrls.clear();
+                    followerUrls.addAll(newFollowerUrls);
                     System.out.println("Discovered followers: " + followerUrls);
                     if (!followerUrls.isEmpty()) break;
                     Thread.sleep(2000); // Wait 2 seconds before retrying
