@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: leader
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: leader
+  template:
+    metadata:
+      labels:
+        app: leader
+    spec:
+      containers:
+        - name: leader
+          image: distributed-system:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: FOLLOWER_SERVICE_NAME
+              value: "follower.default.svc.cluster.local"
+            - name: FOLLOWER_SERVICE_PORT
+              value: "8081"
+            - name: NODE_ROLE
+              value: "leader"
+            - name: SERVER_PORT
+              value: "8080"
+          livenessProbe:
+            httpGet:
+              path: /data/health
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /data/health
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 10

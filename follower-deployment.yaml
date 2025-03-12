@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: follower
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: follower
+  template:
+    metadata:
+      labels:
+        app: follower
+    spec:
+      containers:
+        - name: follower
+          image: distributed-system:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8081
+          env:
+            - name: NODE_ROLE
+              value: "follower"
+            - name: SERVER_PORT
+              value: "8081"
+          livenessProbe:
+            httpGet:
+              path: /replica/health
+              port: 8081
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /replica/health
+              port: 8081
+            initialDelaySeconds: 3
+            periodSeconds: 10
