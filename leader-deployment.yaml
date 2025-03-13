@@ -21,13 +21,11 @@ spec:
           env:
             - name: FOLLOWER_SERVICE_NAME
               value: "follower.default.svc.cluster.local"
-            - name: FOLLOWER_SERVICE_PORT
-              value: "8080"
             - name: NODE_ROLE
               value: "leader"
             - name: SERVER_PORT
               value: "8080"
-            - name: FOLLOWER_DISCOVERY_RATE
+            - name: DISCOVERY_RATE
               value: "10000"
           livenessProbe:
             httpGet:

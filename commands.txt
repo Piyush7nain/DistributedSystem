@@ -12,6 +12,9 @@ docker build --platform linux/arm64 -t distributed-system:latest .
 # Verify the image is built for ARM64
 docker image inspect distributed-system:latest | grep Architecture
 
+# load image to minikube
+minikube image load distributed-system:latest
+
 # Deploy to Minikube
 kubectl apply -f leader-deployment.yaml
 kubectl apply -f follower-deployment.yaml
@@ -59,3 +62,6 @@ kubectl port-forward svc/leader 8080:80
 
 # Access the leader API
 curl http://localhost:8080/data/health
+
+# Test saving data
+curl -X POST http://localhost:8080/data -H "Content-Type: application/json" -d '{ "key1": "value1", "key2": "value2" }'
